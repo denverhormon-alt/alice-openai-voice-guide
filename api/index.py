@@ -283,8 +283,12 @@ class handler(BaseHTTPRequestHandler):
             if not isinstance(event, dict) or (event.get("session") or {}).get("skill_id") != SKILL_ID:
                 return self._reply(403, {"error": "invalid skill"})
             return self._reply(200, handler_alice(event, None))
-        except (ValueError, json.JSONDecodeError):
-            return self._reply(400, {"error": "invalid JSON"})
+        except (ValueError, json.JSONDecodeError) as exc:
+    logging.warning(
+        "Alice webhook JSON parse failed: %s",
+        type(exc).__name__,
+    )
+    return self._reply(400, {"error": "invalid JSON"})
 
     def do_GET(self):
         self._reply(405, {"error": "method not allowed"})
