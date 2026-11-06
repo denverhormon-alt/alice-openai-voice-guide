@@ -96,7 +96,7 @@ def _answer_text(data):
             if part.get("type") == "output_text" and isinstance(part.get("text"), str):
                 parts.append(part["text"])
     text = " ".join(parts)
-    text = re.sub(r"【[^】]{1,160}】|\ue200cite\ue202.*?\ue201", "", text)
+    text = re.sub(r"cite[^ ]{1,160}】|\ue200cite\ue202.*?\ue201", "", text)
     text = re.sub(r"\[([^]]+)\]\(https?://[^)]+\)", r"\1", text)
     text = re.sub(r"https?://\S+", "", text)
     text = re.sub(r"\s*\((?:[\w-]+\.)+[\w-]{2,}(?:/[^)]*)?\)", "", text)
@@ -284,11 +284,11 @@ class handler(BaseHTTPRequestHandler):
                 return self._reply(403, {"error": "invalid skill"})
             return self._reply(200, handler_alice(event, None))
         except (ValueError, json.JSONDecodeError) as exc:
-    logging.warning(
-        "Alice webhook JSON parse failed: %s",
-        type(exc).__name__,
-    )
-    return self._reply(400, {"error": "invalid JSON"})
+            logging.warning(
+                "Alice webhook JSON parse failed: %s",
+                type(exc).__name__,
+            )
+            return self._reply(400, {"error": "invalid JSON"})
 
     def do_GET(self):
         self._reply(405, {"error": "method not allowed"})
@@ -304,4 +304,3 @@ class handler(BaseHTTPRequestHandler):
 
     def log_message(self, format, *args):
         pass  # Не записывать секрет вебхука из URL в журнал приложения.
-
